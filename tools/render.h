@@ -2,7 +2,6 @@
 #define __RENDER_H__
 
 #include <gsKit.h>
-#include <dmaKit.h>
 
 #include "common.h"
 
