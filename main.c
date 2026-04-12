@@ -5,17 +5,39 @@
 #include <libpad.h>
 #include <debug.h>
 
+#include "common.h"
 #include "tools/pad.h"
-
-// will use PAL 640x512 when testing on real PS2
-#define GS_WIDTH 640
-#define GS_HEIGHT 448
-#define GS_MODE GS_MODE_NTSC
+#include "tools/render.h"
 
 // #define DEBUG_PADS
 
 Pad pad_1;
 Pad pad_2;
+
+float ball_position[2] = {0.45, 0.45};
+
+void render(GSGLOBAL* gs_global) {
+    render_quad(gs_global, 0.0, 0.0, 0.5f, 0.5f, GS_SETREG_RGBAQ(128, 0, 0, 0, 0));
+    render_quad(gs_global, 0.5f, 0.f, 0.5f, 0.5f, GS_SETREG_RGBAQ(0, 128, 0, 0, 0));
+    render_quad(gs_global, 0.f, 0.5f, 0.5f, 0.5f, GS_SETREG_RGBAQ(0, 0, 128, 0, 0));
+    render_quad(gs_global, 0.5f, 0.5f, 0.5f, 0.5f, GS_SETREG_RGBAQ(0, 128, 128, 0, 0));
+    render_quad(gs_global, ball_position[0], ball_position[1], 0.1f, 0.1f, GS_SETREG_RGBAQ(255, 255, 255, 0, 0));
+}
+
+void update() {
+    if (pad_button_down(&pad_2, PAD_LEFT)) {
+        ball_position[0] += 0.01f;
+    }
+    if (pad_button_down(&pad_2, PAD_RIGHT)) {
+        ball_position[0] -= 0.01f;
+    }
+    if (pad_button_down(&pad_2, PAD_UP)) {
+        ball_position[1] += 0.01f;
+    }
+    if (pad_button_down(&pad_2, PAD_DOWN)) {
+        ball_position[1] -= 0.01f;
+    }
+}
 
 #ifdef DEBUG_PADS
 void debug_pads() {
@@ -62,7 +84,7 @@ int main() {
 
     GSGLOBAL* gs_global = initialise_graphics();
 
-    u64 background_colour = GS_SETREG_RGBAQ(128, 0, 0, 0, 0);
+    u64 background_colour = GS_SETREG_RGBAQ(128, 128, 128, 0, 0);
 
     while (true) {
         update_pads();
@@ -72,6 +94,10 @@ int main() {
 #endif
 
         gsKit_clear(gs_global, background_colour);
+
+        update();
+        render(gs_global);
+
         gsKit_queue_exec(gs_global);
         gsKit_sync_flip(gs_global);
     }
