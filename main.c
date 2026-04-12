@@ -62,6 +62,8 @@ int main() {
 
     u64 background_colour = GS_SETREG_RGBAQ(128, 128, 128, 0, 0);
 
+    game_initialise(&background_colour);
+
     while (true) {
         update_pads();
 
