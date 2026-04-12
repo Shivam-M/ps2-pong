@@ -1,7 +1,7 @@
 EE_BIN = pong.elf
-EE_OBJS = main.o
+EE_OBJS = main.o pad.o
 # EE_LIBS = -lgraph
-EE_LIBS = -lgskit -ldmakit
+EE_LIBS = -lgskit -ldmakit -lpad -ldebug
 EE_CFLAGS = -I. -I/usr/local/ps2dev/gsKit/include
 EE_LDFLAGS = -L/usr/local/ps2dev/gsKit/lib
 
