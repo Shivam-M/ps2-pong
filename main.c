@@ -5,7 +5,7 @@
 #include <libpad.h>
 #include <debug.h>
 
-#include "pad.h"
+#include "tools/pad.h"
 
 // will use PAL 640x512 when testing on real PS2
 #define GS_WIDTH 640
