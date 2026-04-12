@@ -5,6 +5,12 @@
 
 #include "pad.h"
 
+enum State {
+    STATE_MENU,
+    STATE_PAUSE,
+    STATE_PLAYING
+};
+
 void game_render(GSGLOBAL* gs_global);
 
 void game_update(Pad* pad_1, Pad* pad_2);
