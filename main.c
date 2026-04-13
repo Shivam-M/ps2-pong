@@ -4,6 +4,8 @@
 #include <loadfile.h>
 #include <libpad.h>
 #include <debug.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "common.h"
 #include "pad.h"
@@ -63,6 +65,9 @@ int main() {
     u64 background_colour = GS_SETREG_RGBAQ(128, 128, 128, 0, 0);
 
     game_initialise(&background_colour);
+
+    // think this just returns 0
+    srand(time(NULL));
 
     while (true) {
         update_pads();
