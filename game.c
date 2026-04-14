@@ -7,17 +7,18 @@
 
 enum State state = STATE_PLAYING;
 
+const float INITIAL_BALL_POSITION[2] = {0.5f, 0.5f};
 const float INITIAL_BALL_VELOCITY[2] = {0.0075f, 0.0075f};
 const float BALL_SIZE[2] = {0.025f, 0.025f};
 const float PADDLE_SIZE[2] = {0.01f, 0.10f};
 const float PADDLE_HORIZONTAL_PADDING = 0.05f;
 const float PADDLE_MOVEMENT_SPEED = 0.025f;
+const float PADDLE_HIT_EDGE_FACTOR = 0.5f;
 
-// would be cleaner to centre-align...
-float ball_position[2] = {0.45f, 0.45f};
+float ball_position[2] = {INITIAL_BALL_POSITION[0], INITIAL_BALL_POSITION[1]};
 float ball_velocity[2] = {INITIAL_BALL_VELOCITY[0], INITIAL_BALL_VELOCITY[1]};
 float paddle_position_1[2] = {PADDLE_HORIZONTAL_PADDING, 0.5f};
-float paddle_position_2[2] = {1 - PADDLE_HORIZONTAL_PADDING - PADDLE_SIZE[0], 0.5f};
+float paddle_position_2[2] = {1 - PADDLE_HORIZONTAL_PADDING, 0.5f};
 int score[2] = {0, 0};
 
 void game_render_gameplay(GSGLOBAL* gs_global) {
@@ -39,8 +40,8 @@ void game_render(GSGLOBAL* gs_global) {
 }
 
 void game_reset_ball() {
-    ball_position[0] = 0.45f;
-    ball_position[1] = 0.45f;
+    ball_position[0] = INITIAL_BALL_POSITION[0];
+    ball_position[1] = INITIAL_BALL_POSITION[1];
 
     ball_velocity[0] = INITIAL_BALL_VELOCITY[0];
     ball_velocity[1] = INITIAL_BALL_VELOCITY[1];
