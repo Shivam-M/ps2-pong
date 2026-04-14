@@ -8,16 +8,17 @@
 
 enum State state = STATE_PLAYING;
 
-const float INITIAL_BALL_POSITION[2] = {0.5f, 0.5f};
-const float INITIAL_BALL_VELOCITY[2] = {0.0075f, 0.0075f};
+const float BALL_INITIAL_POSITION[2] = {0.5f, 0.5f};
+const float BALL_INITIAL_VELOCITY[2] = {0.0075f, 0.0075f};
+const float BALL_MAX_HORIZONTAL_VELOCITY = 0.015f;
 const float BALL_SIZE[2] = {0.025f, 0.025f};
 const float PADDLE_SIZE[2] = {0.01f, 0.10f};
 const float PADDLE_HORIZONTAL_PADDING = 0.05f;
 const float PADDLE_MOVEMENT_SPEED = 0.025f;
 const float PADDLE_HIT_EDGE_FACTOR = 0.25f;
 
-float ball_position[2] = {INITIAL_BALL_POSITION[0], INITIAL_BALL_POSITION[1]};
-float ball_velocity[2] = {INITIAL_BALL_VELOCITY[0], INITIAL_BALL_VELOCITY[1]};
+float ball_position[2] = {BALL_INITIAL_POSITION[0], BALL_INITIAL_POSITION[1]};
+float ball_velocity[2] = {BALL_INITIAL_VELOCITY[0], BALL_INITIAL_VELOCITY[1]};
 float paddle_position_1[2] = {PADDLE_HORIZONTAL_PADDING, 0.5f};
 float paddle_position_2[2] = {1 - PADDLE_HORIZONTAL_PADDING, 0.5f};
 int score[2] = {0, 0};
@@ -54,11 +55,11 @@ void game_render(GSGLOBAL* gs_global) {
 }
 
 void game_reset_ball() {
-    ball_position[0] = INITIAL_BALL_POSITION[0];
-    ball_position[1] = INITIAL_BALL_POSITION[1];
+    ball_position[0] = BALL_INITIAL_POSITION[0];
+    ball_position[1] = BALL_INITIAL_POSITION[1];
 
-    ball_velocity[0] = INITIAL_BALL_VELOCITY[0];
-    ball_velocity[1] = INITIAL_BALL_VELOCITY[1];
+    ball_velocity[0] = BALL_INITIAL_VELOCITY[0];
+    ball_velocity[1] = BALL_INITIAL_VELOCITY[1];
 
     if (rand() % 2) {
         ball_velocity[0] *= -1.f;
@@ -121,6 +122,7 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
 
     if (get_paddle_relative_hit(ball_velocity[0] < 0.0f ? paddle_position_1 : paddle_position_2, &relative_hit)) {
         ball_velocity[0] *= -1 - (PADDLE_HIT_EDGE_FACTOR * fabsf(relative_hit - 0.5f));
+        ball_velocity[0] = fminf(fmaxf(ball_velocity[0], -BALL_MAX_HORIZONTAL_VELOCITY), BALL_MAX_HORIZONTAL_VELOCITY);
     }
 
     #ifdef DEBUG_GAME
