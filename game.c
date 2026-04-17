@@ -54,6 +54,13 @@ void game_render(GSGLOBAL* gs_global) {
     }
 }
 
+void game_update_pause(Pad* pad_1, Pad* pad_2) {
+    if (pad_button_pressed(pad_1, PAD_START)) {
+        state = STATE_PLAYING;
+        return;
+    }
+}
+
 void game_reset_ball() {
     ball_position[0] = BALL_INITIAL_POSITION[0];
     ball_position[1] = BALL_INITIAL_POSITION[1];
@@ -101,6 +108,11 @@ void game_update_paddle(Pad* pad, float paddle_position[2]) {
 }
 
 void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
+    if (pad_button_pressed(pad_1, PAD_START)) {
+        state = STATE_PAUSE;
+        return;
+    }
+
     game_update_paddle(pad_1, paddle_position_1);
     game_update_paddle(pad_2, paddle_position_2);
 
@@ -136,6 +148,7 @@ void game_update(Pad* pad_1, Pad* pad_2) {
             game_update_gameplay(pad_1, pad_2);
             break;
         case STATE_PAUSE:
+            game_update_pause(pad_1, pad_2);
             break;
         case STATE_MENU:
             break;
