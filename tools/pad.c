@@ -17,5 +17,5 @@ void pad_update(Pad* pad) {
 }
 
 bool pad_button_down(Pad* pad, int button) {
-    return pad->buttons.btns & button;
+    return !(pad->buttons.btns & button);
 }

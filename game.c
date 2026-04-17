@@ -91,10 +91,10 @@ bool get_paddle_relative_hit(float paddle_position[2], float* relative_hit) {
 
 void game_update_paddle(Pad* pad, float paddle_position[2]) {
     if (pad_button_down(pad, PAD_UP)) {
-        paddle_position[1] += PADDLE_MOVEMENT_SPEED;
+        paddle_position[1] -= PADDLE_MOVEMENT_SPEED;
     }
     if (pad_button_down(pad, PAD_DOWN)) {
-        paddle_position[1] -= PADDLE_MOVEMENT_SPEED;
+        paddle_position[1] += PADDLE_MOVEMENT_SPEED;
     }
 
     paddle_position[1] = fminf(fmaxf(paddle_position[1], 0.0f), 1.0f);
