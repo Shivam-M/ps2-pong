@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <debug.h>
 
 #include "game.h"
@@ -22,6 +23,9 @@ float ball_velocity[2] = {BALL_INITIAL_VELOCITY[0], BALL_INITIAL_VELOCITY[1]};
 float paddle_position_1[2] = {PADDLE_HORIZONTAL_PADDING, 0.5f};
 float paddle_position_2[2] = {1 - PADDLE_HORIZONTAL_PADDING, 0.5f};
 int score[2] = {0, 0};
+char formatted_score[16] = "0 - 0";
+
+GSFONT* font;
 
 // #define DEBUG_GAME
 
@@ -33,13 +37,16 @@ void game_debug() {
     scr_printf("LEFT PADDLE: %f\n", paddle_position_1[1]);
     scr_printf("RIGHT PADDLE: %f\n", paddle_position_2[1]);
     scr_printf("SCORE: %d vs %d\n", score[0], score[1]);
+    scr_printf("FONT: %p\n", font);
 }
 #endif
 
 void game_render_gameplay(GSGLOBAL* gs_global) {
-    render_quad(gs_global, paddle_position_1[0], paddle_position_1[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0, 0));
-    render_quad(gs_global, paddle_position_2[0], paddle_position_2[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0, 0));
-    render_quad(gs_global, ball_position[0], ball_position[1], BALL_SIZE[0], BALL_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0, 0));
+    render_text(gs_global, 0.5f, 0.1f, 4.0f, font, GS_SETREG_RGBAQ(255, 255, 255, 0, 0), formatted_score);
+
+    render_quad(gs_global, paddle_position_1[0], paddle_position_1[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
+    render_quad(gs_global, paddle_position_2[0], paddle_position_2[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
+    render_quad(gs_global, ball_position[0], ball_position[1], BALL_SIZE[0], BALL_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
 }
 
 void game_render(GSGLOBAL* gs_global) {
@@ -121,6 +128,7 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
 
     if (ball_position[0] < 0.f || ball_position[0] > 1.f) {
         score[ball_position[0] < 0.f ? 1 : 0]++;
+        snprintf(formatted_score, sizeof(formatted_score), "%d - %d", score[0], score[1]);
         game_reset_ball();
         return;
     }
@@ -155,8 +163,10 @@ void game_update(Pad* pad_1, Pad* pad_2) {
     }
 }
 
-void game_initialise(u64* background_colour) {
-    *background_colour = GS_SETREG_RGBAQ(40, 40, 40, 0, 0);
+void game_initialise(GSGLOBAL* gs_global, u64* background_colour) {
+    *background_colour = GS_SETREG_RGBAQ(0, 0, 0, 0, 0);
+
+    font = load_font(gs_global, "fonts/press-start-2p.bmp");
 
     game_reset_ball();
 }

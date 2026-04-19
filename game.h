@@ -15,6 +15,6 @@ void game_render(GSGLOBAL* gs_global);
 
 void game_update(Pad* pad_1, Pad* pad_2);
 
-void game_initialise(u64* background_colour);
+void game_initialise(GSGLOBAL* gs_global, u64* background_colour);
 
 #endif

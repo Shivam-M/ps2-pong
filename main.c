@@ -64,7 +64,7 @@ int main() {
 
     u64 background_colour = GS_SETREG_RGBAQ(128, 128, 128, 0, 0);
 
-    game_initialise(&background_colour);
+    game_initialise(gs_global, &background_colour);
 
     // think this just returns 0
     srand(time(NULL));
