@@ -41,8 +41,13 @@ void game_debug() {
 }
 #endif
 
+void game_render_pause(GSGLOBAL* gs_global) {
+    render_text(gs_global, 0.5f, 0.475f, 4.0f, font, GS_SETREG_RGBAQ(255, 0, 0, 0x80, 0), "PAUSED");
+    render_text(gs_global, 0.5f, 0.55f, 2.0f, font, GS_SETREG_RGBAQ(255, 0, 0, 0x80, 0), "PRESS START TO RESUME");
+}
+
 void game_render_gameplay(GSGLOBAL* gs_global) {
-    render_text(gs_global, 0.5f, 0.1f, 4.0f, font, GS_SETREG_RGBAQ(255, 255, 255, 0, 0), formatted_score);
+    render_text(gs_global, 0.5f, 0.1f, 4.0f, font, GS_SETREG_RGBAQ(230, 230, 230, 0, 0), formatted_score);
 
     render_quad(gs_global, paddle_position_1[0], paddle_position_1[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
     render_quad(gs_global, paddle_position_2[0], paddle_position_2[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
@@ -55,6 +60,8 @@ void game_render(GSGLOBAL* gs_global) {
             game_render_gameplay(gs_global);
             break;
         case STATE_PAUSE:
+            game_render_gameplay(gs_global);
+            game_render_pause(gs_global);
             break;
         case STATE_MENU:
             break;
