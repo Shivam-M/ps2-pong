@@ -6,8 +6,11 @@
 #include "game.h"
 #include "pad.h"
 #include "render.h"
+#include "menu.h"
 
-enum State state = STATE_PLAYING;
+enum State state = STATE_MENU;
+struct Menu* current_menu;
+GSFONT* font;
 
 const float BALL_INITIAL_POSITION[2] = {0.5f, 0.5f};
 const float BALL_INITIAL_VELOCITY[2] = {0.0075f, 0.0075f};
@@ -25,8 +28,6 @@ float paddle_position_2[2] = {1 - PADDLE_HORIZONTAL_PADDING, 0.5f};
 int score[2] = {0, 0};
 char formatted_score[16] = "0 - 0";
 
-GSFONT* font;
-
 // #define DEBUG_GAME
 
 #ifdef DEBUG_GAME
@@ -40,6 +41,28 @@ void game_debug() {
     scr_printf("FONT: %p\n", font);
 }
 #endif
+
+void game_render_menu(GSGLOBAL* gs_global) {
+    const float MENU_VERTICAL_STEP = 0.1f;
+    float y = 0.5f - ((current_menu->size / 2) * MENU_VERTICAL_STEP);
+
+    for (int i = 0; i < current_menu->size; i++) {
+        const struct MenuItem* item = &current_menu->items[i];
+
+        u64 colour;
+
+        if (!item->enabled) {
+            colour = GS_SETREG_RGBAQ(50, 50, 50, 0, 0);
+        } else if (current_menu->selected == i) {
+            colour = GS_SETREG_RGBAQ(0, 0, 255, 0x80, 0);
+        } else {
+            colour = GS_SETREG_RGBAQ(255, 255, 255, 0x80, 0);
+        }
+
+        render_text(gs_global, 0.5f, y, 2.0f, font, colour, item->name);
+        y += MENU_VERTICAL_STEP;
+    }
+}
 
 void game_render_pause(GSGLOBAL* gs_global) {
     render_text(gs_global, 0.5f, 0.475f, 4.0f, font, GS_SETREG_RGBAQ(255, 0, 0, 0x80, 0), "PAUSED");
@@ -64,7 +87,45 @@ void game_render(GSGLOBAL* gs_global) {
             game_render_pause(gs_global);
             break;
         case STATE_MENU:
+            game_render_menu(gs_global);
             break;
+    }
+}
+
+void game_invoke_menu_action(enum MenuAction action) {
+    switch (action) {
+        case MENU_MAIN_PLAY_1P:
+            state = STATE_PLAYING;
+            break;
+        case MENU_MAIN_PLAY_2P:
+            state = STATE_PLAYING;
+            break;
+        case MENU_MAIN_OPTIONS:
+            current_menu = get_options_menu();
+            break;
+        case MENU_OPTIONS_BACK:
+            current_menu = get_main_menu();
+            break;
+    }
+}
+
+void game_update_menu(Pad* pad_1, Pad* pad_2) {
+    if (pad_button_pressed(pad_1, PAD_CROSS)) {
+        return game_invoke_menu_action(current_menu->items[current_menu->selected].action);
+    }
+
+    if (pad_button_pressed(pad_1, PAD_CIRCLE)) {
+        if (current_menu->back_action != MENU_NULL) {
+            return game_invoke_menu_action(current_menu->back_action);
+        }
+    }
+
+    if (pad_button_pressed(pad_1, PAD_DOWN)) {
+        menu_cycle(current_menu, 1);
+    }
+
+    if (pad_button_pressed(pad_1, PAD_UP)) {
+        menu_cycle(current_menu, -1);
     }
 }
 
@@ -166,6 +227,7 @@ void game_update(Pad* pad_1, Pad* pad_2) {
             game_update_pause(pad_1, pad_2);
             break;
         case STATE_MENU:
+            game_update_menu(pad_1, pad_2);
             break;
     }
 }
@@ -174,6 +236,8 @@ void game_initialise(GSGLOBAL* gs_global, u64* background_colour) {
     *background_colour = GS_SETREG_RGBAQ(0, 0, 0, 0, 0);
 
     font = load_font(gs_global, "fonts/press-start-2p.bmp");
+
+    current_menu = get_main_menu();
 
     game_reset_ball();
 }
