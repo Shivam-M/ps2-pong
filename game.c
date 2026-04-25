@@ -42,6 +42,33 @@ void game_debug() {
 }
 #endif
 
+void game_reset_ball() {
+    ball_position[0] = BALL_INITIAL_POSITION[0];
+    ball_position[1] = BALL_INITIAL_POSITION[1];
+
+    ball_velocity[0] = BALL_INITIAL_VELOCITY[0];
+    ball_velocity[1] = BALL_INITIAL_VELOCITY[1];
+
+    if (rand() % 2) {
+        ball_velocity[0] *= -1.f;
+    }
+
+    if (rand() % 2) {
+        ball_velocity[1] *= -1.f;
+    }
+}
+
+void game_reset_state() {
+    score[0] = 0;
+    score[1] = 0;
+    snprintf(formatted_score, sizeof(formatted_score), "0 - 0");
+
+    paddle_position_1[1] = 0.5f;
+    paddle_position_2[1] = 0.5f;
+
+    game_reset_ball();
+}
+
 void game_render_menu(GSGLOBAL* gs_global) {
     const float MENU_VERTICAL_STEP = 0.1f;
     float y = 0.5f - ((current_menu->size / 2) * MENU_VERTICAL_STEP);
@@ -95,9 +122,11 @@ void game_render(GSGLOBAL* gs_global) {
 void game_invoke_menu_action(enum MenuAction action) {
     switch (action) {
         case MENU_MAIN_PLAY_1P:
+            game_reset_state();
             state = STATE_PLAYING;
             break;
         case MENU_MAIN_PLAY_2P:
+            game_reset_state();
             state = STATE_PLAYING;
             break;
         case MENU_MAIN_OPTIONS:
@@ -134,21 +163,10 @@ void game_update_pause(Pad* pad_1, Pad* pad_2) {
         state = STATE_PLAYING;
         return;
     }
-}
 
-void game_reset_ball() {
-    ball_position[0] = BALL_INITIAL_POSITION[0];
-    ball_position[1] = BALL_INITIAL_POSITION[1];
-
-    ball_velocity[0] = BALL_INITIAL_VELOCITY[0];
-    ball_velocity[1] = BALL_INITIAL_VELOCITY[1];
-
-    if (rand() % 2) {
-        ball_velocity[0] *= -1.f;
-    }
-
-    if (rand() % 2) {
-        ball_velocity[1] *= -1.f;
+    if (pad_button_pressed(pad_1, PAD_SELECT)) {
+        state = STATE_MENU;
+        return;
     }
 }
 
