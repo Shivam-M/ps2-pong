@@ -19,10 +19,11 @@ static struct Menu options_menu = {
         {"SCORE LIMIT", MENU_OPTIONS_END_SCORE, .enabled = true},
         {"DIFFICULTY", MENU_OPTIONS_DIFFICULTY, .enabled = false},
         {"OFFSETS", MENU_OPTIONS_OFFSETS, .enabled = true},
+        {"AUDIO", MENU_OPTIONS_AUDIO, .enabled = true},
         {"BACK", MENU_OPTIONS_BACK, .enabled = true}
     },
     .back_action = MENU_OPTIONS_BACK,
-    .size = 6
+    .size = 7
 };
 
 // should really validate that all items aren't disabled (even if it is very unlikely)
