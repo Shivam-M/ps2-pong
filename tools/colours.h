@@ -1,0 +1,21 @@
+#ifndef __COLOURS_H__
+#define __COLOURS_H__
+
+#include <gsKit.h>
+
+static const u64 COLOUR_WHITE = GS_SETREG_RGBAQ(255, 255, 255, 0, 0);
+static const u64 COLOUR_BLACK = GS_SETREG_RGBAQ(0, 0, 0, 0, 0);
+static const u64 COLOUR_RED = GS_SETREG_RGBAQ(255, 0, 0, 0, 0);
+static const u64 COLOUR_GREEN = GS_SETREG_RGBAQ(0, 255, 0, 0, 0);
+static const u64 COLOUR_BLUE = GS_SETREG_RGBAQ(0, 0, 255, 0, 0);
+static const u64 COLOUR_GREY = GS_SETREG_RGBAQ(230, 230, 230, 0, 0);
+
+static const u64 COLOUR_MENU_ITEM_DISABLED = GS_SETREG_RGBAQ(50, 50, 50, 0, 0);
+static const u64 COLOUR_MENU_ITEM_SELECTED = COLOUR_BLUE;
+static const u64 COLOUR_MENU_ITEM_DEFAULT = COLOUR_WHITE;
+static const u64 COLOUR_MENU_ITEM_HELP = GS_SETREG_RGBAQ(72, 52, 212, 0, 0);
+
+static const u64 COLOUR_GAME_BACKGROUND = COLOUR_BLACK;
+static const u64 COLOUR_GAME_FOREGROUND = COLOUR_WHITE;
+
+#endif

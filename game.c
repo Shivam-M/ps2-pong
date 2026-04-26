@@ -7,6 +7,7 @@
 #include "pad.h"
 #include "render.h"
 #include "menu.h"
+#include "colours.h"
 
 enum State state = STATE_MENU;
 struct Menu* current_menu;
@@ -80,11 +81,11 @@ void game_render_menu(GSGLOBAL* gs_global) {
         u64 colour;
 
         if (!item->enabled) {
-            colour = GS_SETREG_RGBAQ(50, 50, 50, 0, 0);
+            colour = COLOUR_MENU_ITEM_DISABLED;
         } else if (current_menu->selected == i) {
-            colour = GS_SETREG_RGBAQ(0, 0, 255, 0x80, 0);
+            colour = COLOUR_MENU_ITEM_SELECTED;
         } else {
-            colour = GS_SETREG_RGBAQ(255, 255, 255, 0x80, 0);
+            colour = COLOUR_MENU_ITEM_DEFAULT;
         }
 
         render_text(gs_global, 0.5f, y, 2.0f, font, colour, item->name);
@@ -92,21 +93,21 @@ void game_render_menu(GSGLOBAL* gs_global) {
     }
 
     if (menu_help_text) {
-        render_text(gs_global, 0.5, 0.9, 1.0f, font, GS_SETREG_RGBAQ(72, 52, 212, 0x80, 0), menu_help_text);
+        render_text(gs_global, 0.5, 0.9, 1.0f, font, COLOUR_MENU_ITEM_HELP, menu_help_text);
     }
 }
 
 void game_render_pause(GSGLOBAL* gs_global) {
-    render_text(gs_global, 0.5f, 0.475f, 4.0f, font, GS_SETREG_RGBAQ(255, 0, 0, 0x80, 0), "PAUSED");
-    render_text(gs_global, 0.5f, 0.55f, 2.0f, font, GS_SETREG_RGBAQ(255, 0, 0, 0x80, 0), "PRESS START TO RESUME");
+    render_text(gs_global, 0.5f, 0.475f, 4.0f, font, COLOUR_RED, "PAUSED");
+    render_text(gs_global, 0.5f, 0.55f, 2.0f, font, COLOUR_RED, "PRESS START TO RESUME");
 }
 
 void game_render_gameplay(GSGLOBAL* gs_global) {
-    render_text(gs_global, 0.5f, 0.1f, 4.0f, font, GS_SETREG_RGBAQ(230, 230, 230, 0, 0), formatted_score);
+    render_text(gs_global, 0.5f, 0.1f, 4.0f, font, COLOUR_GREY, formatted_score);
 
-    render_quad(gs_global, paddle_position_1[0], paddle_position_1[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
-    render_quad(gs_global, paddle_position_2[0], paddle_position_2[1], PADDLE_SIZE[0], PADDLE_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
-    render_quad(gs_global, ball_position[0], ball_position[1], BALL_SIZE[0], BALL_SIZE[1], GS_SETREG_RGBAQ(255, 255, 255, 0x40, 0));
+    render_quad(gs_global, paddle_position_1[0], paddle_position_1[1], PADDLE_SIZE[0], PADDLE_SIZE[1], COLOUR_GAME_FOREGROUND);
+    render_quad(gs_global, paddle_position_2[0], paddle_position_2[1], PADDLE_SIZE[0], PADDLE_SIZE[1], COLOUR_GAME_FOREGROUND);
+    render_quad(gs_global, ball_position[0], ball_position[1], BALL_SIZE[0], BALL_SIZE[1], COLOUR_GAME_FOREGROUND);
 }
 
 void game_render(GSGLOBAL* gs_global) {
@@ -296,7 +297,7 @@ void game_update(Pad* pad_1, Pad* pad_2) {
 }
 
 void game_initialise(GSGLOBAL* gs_global, u64* background_colour) {
-    *background_colour = GS_SETREG_RGBAQ(0, 0, 0, 0, 0);
+    *background_colour = COLOUR_BLACK;
 
     font = load_font(gs_global, "fonts/press-start-2p.bmp");
 
