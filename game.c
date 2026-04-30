@@ -144,8 +144,24 @@ void game_invoke_menu_action(enum MenuAction action) {
     }
 }
 
+void game_update_menu_dependencies(Pad* pad_1, Pad* pad_2) {
+    if (current_menu == get_options_menu()) {
+        bool is_game_mode_time_limit = menu_choice_selected_value(&menu_choices_mode) == MENU_VALUE_MODE_TIME;
+
+        menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->enabled = is_game_mode_time_limit;
+        menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->enabled = !is_game_mode_time_limit;
+
+    } else if (current_menu == get_main_menu()) {
+        bool is_second_pad_connected = pad_2->state == PAD_STATE_STABLE;
+
+        menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->enabled = is_second_pad_connected;
+    }
+}
+
 void game_update_menu(Pad* pad_1, Pad* pad_2) {
     menu_help_text = menu_build_help_text(&current_menu->items[current_menu->selected]);
+
+    game_update_menu_dependencies(pad_1, pad_2);
 
     if (pad_button_pressed(pad_1, PAD_CROSS)) {
         return game_invoke_menu_action(current_menu->items[current_menu->selected].action);

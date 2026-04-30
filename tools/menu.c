@@ -71,7 +71,7 @@ static struct Menu options_menu = {
         {"GAME MODE", MENU_OPTIONS_MODE, .enabled = true, .choices = &menu_choices_mode},
         {"TIME LIMIT", MENU_OPTIONS_TIME_LIMIT, .enabled = false, .choices = &menu_choices_time_limit},
         {"SCORE LIMIT", MENU_OPTIONS_END_SCORE, .enabled = true, .choices = &menu_choices_score_limit},
-        {"DIFFICULTY", MENU_OPTIONS_DIFFICULTY, .enabled = false, .choices = &menu_choices_difficulty},
+        {"DIFFICULTY", MENU_OPTIONS_DIFFICULTY, .enabled = true, .choices = &menu_choices_difficulty},
         {"OFFSETS", MENU_OPTIONS_OFFSETS, .enabled = true},
         {"AUDIO", MENU_OPTIONS_AUDIO, .enabled = true, .choices = &menu_choices_audio},
         {"BACK", MENU_OPTIONS_BACK, .enabled = true}
@@ -92,6 +92,16 @@ enum MenuValue menu_choice_selected_value(const struct MenuChoice* choice) {
     if (!choice) return MENU_VALUE_NULL;
 
     return choice->options[choice->selected].value;
+}
+
+struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action) {
+    for (int i = 0; i < menu->size; i++) {
+        if (menu->items[i].action == action) {
+            return &menu->items[i];
+        }
+    }
+
+    return NULL;
 }
 
 const char* menu_build_help_text(const struct MenuItem* item) {
