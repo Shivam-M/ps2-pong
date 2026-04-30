@@ -19,10 +19,48 @@ enum MenuAction {
     MENU_OPTIONS_BACK
 };
 
+enum MenuValue {
+    MENU_VALUE_NULL,
+
+    MENU_VALUE_MODE_SCORE,
+    MENU_VALUE_MODE_TIME,
+
+    MENU_VALUE_SCORE_LIMIT_1,
+    MENU_VALUE_SCORE_LIMIT_2,
+    MENU_VALUE_SCORE_LIMIT_3,
+    MENU_VALUE_SCORE_LIMIT_4,
+    MENU_VALUE_SCORE_LIMIT_5,
+
+    MENU_VALUE_TIME_LIMIT_1,
+    MENU_VALUE_TIME_LIMIT_2,
+    MENU_VALUE_TIME_LIMIT_3,
+    MENU_VALUE_TIME_LIMIT_4,
+    MENU_VALUE_TIME_LIMIT_5,
+
+    MENU_VALUE_DIFFICULTY_EASY,
+    MENU_VALUE_DIFFICULTY_MEDIUM,
+    MENU_VALUE_DIFFICULTY_HARD,
+
+    MENU_VALUE_AUDIO_ON,
+    MENU_VALUE_AUDIO_OFF
+};
+
 struct MenuItem {
     const char* name;
     enum MenuAction action;
     bool enabled;
+    struct MenuChoice* choices;
+};
+
+struct MenuOption {
+    const char* name;
+    enum MenuValue value;
+};
+
+struct MenuChoice {
+    int selected;
+    int size;
+    struct MenuOption options[];
 };
 
 struct Menu {
@@ -31,6 +69,14 @@ struct Menu {
     enum MenuAction back_action;
     struct MenuItem items[];
 };
+
+extern struct MenuChoice menu_choices_mode;
+extern struct MenuChoice menu_choices_difficulty;
+extern struct MenuChoice menu_choices_audio;
+
+const char* menu_build_help_text(const struct MenuItem* item);
+
+void menu_cycle_choice(struct MenuItem* item, int direction);
 
 void menu_cycle(struct Menu* menu, int direction);
 

@@ -125,44 +125,6 @@ void game_render(GSGLOBAL* gs_global) {
     }
 }
 
-const char* get_menu_help_text(enum MenuAction action) {
-    static char buffer[64];
-    switch (action) {
-        case MENU_MAIN_PLAY_1P:
-            return "Play vs AI - adjust difficulty in options";
-        case MENU_MAIN_PLAY_2P:
-            return "Local 1v1 - requires two controllers";
-        case MENU_MAIN_OPTIONS:
-            return "Change game mode, difficulty, and more";
-        case MENU_OPTIONS_BACK:
-            return "Return to the main menu";
-        case MENU_OPTIONS_MODE:
-            const char* game_mode = "SCORE LIMIT";
-            snprintf(buffer, sizeof(buffer), "<< GAME MODE: %s >>", game_mode);
-            return buffer;
-        case MENU_OPTIONS_END_SCORE:
-            int end_score = 10;
-            snprintf(buffer, sizeof(buffer), "<< FIRST TO: %d >>", end_score);
-            return buffer;
-        case MENU_OPTIONS_TIME_LIMIT:
-            int time_limit = 90;
-            snprintf(buffer, sizeof(buffer), "<< TIME LIMIT: %02d:%02d >>", time_limit / 60, time_limit % 60);
-            return buffer;
-        case MENU_OPTIONS_DIFFICULTY:
-            const char* difficulty = "MEDIUM";
-            snprintf(buffer, sizeof(buffer), "[MEDIUM: %s]", difficulty);
-            return buffer;
-        case MENU_OPTIONS_OFFSETS:
-            return "Adjust screen horizontal/vertical offsets";
-        case MENU_OPTIONS_AUDIO:
-            bool audio_enabled = false;
-            snprintf(buffer, sizeof(buffer), "<< AUDIO: %s >>", audio_enabled ? "ENABLED" : "DISABLED");
-            return buffer;
-        default:
-            return NULL;
-    }
-}
-
 void game_invoke_menu_action(enum MenuAction action) {
     switch (action) {
         case MENU_MAIN_PLAY_1P:
@@ -183,7 +145,7 @@ void game_invoke_menu_action(enum MenuAction action) {
 }
 
 void game_update_menu(Pad* pad_1, Pad* pad_2) {
-    menu_help_text = get_menu_help_text(current_menu->items[current_menu->selected].action);
+    menu_help_text = menu_build_help_text(&current_menu->items[current_menu->selected]);
 
     if (pad_button_pressed(pad_1, PAD_CROSS)) {
         return game_invoke_menu_action(current_menu->items[current_menu->selected].action);
@@ -201,6 +163,14 @@ void game_update_menu(Pad* pad_1, Pad* pad_2) {
 
     if (pad_button_pressed(pad_1, PAD_UP)) {
         menu_cycle(current_menu, -1);
+    }
+
+    if (pad_button_pressed(pad_1, PAD_LEFT)) {
+        menu_cycle_choice(&current_menu->items[current_menu->selected], -1);
+    }
+
+    if (pad_button_pressed(pad_1, PAD_RIGHT)) {
+        menu_cycle_choice(&current_menu->items[current_menu->selected], 1);
     }
 }
 
