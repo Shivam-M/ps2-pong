@@ -8,8 +8,10 @@
 #include "render.h"
 #include "menu.h"
 #include "colours.h"
+#include "utils.h"
 
 enum State state = STATE_MENU;
+struct Settings settings = {0};
 struct Menu* current_menu;
 GSFONT* font;
 
@@ -28,6 +30,8 @@ float paddle_position_1[2] = {PADDLE_HORIZONTAL_PADDING, 0.5f};
 float paddle_position_2[2] = {1 - PADDLE_HORIZONTAL_PADDING, 0.5f};
 int score[2] = {0, 0};
 char formatted_score[16] = "0 - 0";
+char subtitle[16] = {0};
+int remaining_time = 0;
 
 // #define DEBUG_GAME
 
@@ -42,6 +46,31 @@ void game_debug() {
     scr_printf("FONT: %p\n", font);
 }
 #endif
+
+void game_load_settings() {
+    settings.audio = menu_choice_selected_option(&menu_choices_audio)->value == MENU_VALUE_AUDIO_ON;
+    settings.game_mode = menu_choice_selected_option(&menu_choices_mode)->value;
+
+    if (settings.game_mode == MENU_VALUE_MODE_TIME) {
+        settings.time_limit = get_seconds_from_time(menu_choice_selected_option(&menu_choices_time_limit)->name);
+
+        if (settings.time_limit == -1) {
+            settings.time_limit = 90;
+        }
+
+    } else if (settings.game_mode == MENU_VALUE_MODE_SCORE) {
+        settings.score_limit = atoi(menu_choice_selected_option(&menu_choices_score_limit)->name);
+
+        if (settings.score_limit == 0) {
+            settings.score_limit = 5;
+        }
+
+        snprintf(subtitle, sizeof(subtitle), "FIRST TO %d", settings.score_limit);
+
+    } else {
+        subtitle[0] = '\0';
+    }
+}
 
 void game_reset_ball() {
     ball_position[0] = BALL_INITIAL_POSITION[0];
@@ -60,14 +89,18 @@ void game_reset_ball() {
 }
 
 void game_reset_state() {
-    score[0] = 0;
-    score[1] = 0;
-    snprintf(formatted_score, sizeof(formatted_score), "0 - 0");
+    game_load_settings();
+    game_reset_ball();
+
+    remaining_time = settings.time_limit;
 
     paddle_position_1[1] = 0.5f;
     paddle_position_2[1] = 0.5f;
 
-    game_reset_ball();
+    score[0] = 0;
+    score[1] = 0;
+
+    snprintf(formatted_score, sizeof(formatted_score), "0 - 0");
 }
 
 void game_render_menu(GSGLOBAL* gs_global) {
@@ -114,7 +147,11 @@ void game_render_pause(GSGLOBAL* gs_global) {
 }
 
 void game_render_gameplay(GSGLOBAL* gs_global) {
-    render_text(gs_global, 0.5f, 0.1f, 4.0f, font, COLOUR_GREY, formatted_score);
+    render_text(gs_global, 0.5f, 0.1f, 3.0f, font, COLOUR_GREY, formatted_score);
+
+    if (*subtitle) {
+        render_text(gs_global, 0.5f, 0.165f, 1.0f, font, COLOUR_DARK_GREY, subtitle);
+    }
 
     render_quad(gs_global, paddle_position_1[0], paddle_position_1[1], PADDLE_SIZE[0], PADDLE_SIZE[1], COLOUR_GAME_FOREGROUND);
     render_quad(gs_global, paddle_position_2[0], paddle_position_2[1], PADDLE_SIZE[0], PADDLE_SIZE[1], COLOUR_GAME_FOREGROUND);
@@ -157,7 +194,7 @@ void game_invoke_menu_action(enum MenuAction action) {
 
 void game_update_menu_dependencies(Pad* pad_1, Pad* pad_2) {
     if (current_menu == get_options_menu()) {
-        enum MenuValue game_mode = menu_choice_selected_value(&menu_choices_mode);
+        enum MenuValue game_mode = menu_choice_selected_option(&menu_choices_mode)->value;
 
         menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->disabled = game_mode != MENU_VALUE_MODE_TIME;
         menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->disabled = game_mode != MENU_VALUE_MODE_SCORE;
@@ -243,6 +280,10 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
     if (pad_button_pressed(pad_1, PAD_START)) {
         state = STATE_PAUSE;
         return;
+    }
+
+    if (settings.game_mode == MENU_VALUE_MODE_TIME) {
+        snprintf(subtitle, sizeof(subtitle), "%s", get_time_from_seconds(remaining_time));
     }
 
     game_update_paddle(pad_1, paddle_position_1);

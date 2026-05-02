@@ -73,12 +73,14 @@ struct Menu {
 };
 
 extern struct MenuChoice menu_choices_mode;
+extern struct MenuChoice menu_choices_time_limit;
+extern struct MenuChoice menu_choices_score_limit;
 extern struct MenuChoice menu_choices_difficulty;
 extern struct MenuChoice menu_choices_audio;
 
 const struct MenuOption* menu_item_selected_option(const struct MenuItem* item);
 
-enum MenuValue menu_choice_selected_value(const struct MenuChoice* choice);
+const struct MenuOption* menu_choice_selected_option(const struct MenuChoice* choice);
 
 struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action);
 

@@ -4,6 +4,17 @@
 #include <gsKit.h>
 
 #include "pad.h"
+#include "menu.h"
+
+struct Settings {
+    enum MenuValue game_mode;
+    union {
+        int time_limit;
+        int score_limit;
+    };
+    int offsets[2];
+    bool audio;
+};
 
 enum State {
     STATE_MENU,

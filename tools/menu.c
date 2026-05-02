@@ -84,15 +84,13 @@ static struct Menu options_menu = {
 const struct MenuOption NULL_OPTION = {"NULL", MENU_VALUE_NULL};
 
 const struct MenuOption* menu_item_selected_option(const struct MenuItem* item) {
-    if (!item->choices) return &NULL_OPTION;
-
-    return &item->choices->options[item->choices->selected];
+    return menu_choice_selected_option(item->choices);
 }
 
-enum MenuValue menu_choice_selected_value(const struct MenuChoice* choice) {
+const struct MenuOption* menu_choice_selected_option(const struct MenuChoice* choice) {
     if (!choice) return MENU_VALUE_NULL;
 
-    return choice->options[choice->selected].value;
+    return &choice->options[choice->selected];
 }
 
 struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action) {
