@@ -157,10 +157,10 @@ void game_invoke_menu_action(enum MenuAction action) {
 
 void game_update_menu_dependencies(Pad* pad_1, Pad* pad_2) {
     if (current_menu == get_options_menu()) {
-        bool is_game_mode_time_limit = menu_choice_selected_value(&menu_choices_mode) == MENU_VALUE_MODE_TIME;
+        enum MenuValue game_mode = menu_choice_selected_value(&menu_choices_mode);
 
-        menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->disabled = !is_game_mode_time_limit;
-        menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->disabled = is_game_mode_time_limit;
+        menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->disabled = game_mode != MENU_VALUE_MODE_TIME;
+        menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->disabled = game_mode != MENU_VALUE_MODE_SCORE;
 
     } else if (current_menu == get_main_menu()) {
         menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->disabled = pad_2->state != PAD_STATE_STABLE;

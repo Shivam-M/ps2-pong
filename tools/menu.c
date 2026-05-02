@@ -16,10 +16,11 @@ static struct Menu main_menu = {
 struct MenuChoice menu_choices_mode = {
     .selected = 0,
     .options = {
-        {"FIRST TO SCORE", MENU_VALUE_MODE_SCORE},
-        {"TIME LIMIT", MENU_VALUE_MODE_TIME}
+        {"SCORE LIMIT", MENU_VALUE_MODE_SCORE},
+        {"TIME LIMIT", MENU_VALUE_MODE_TIME},
+        {"FREE PLAY", MENU_VALUE_MODE_UNLIMITED}
     },
-    .size = 2
+    .size = 3
 };
 
 struct MenuChoice menu_choices_time_limit = {
