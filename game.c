@@ -12,7 +12,6 @@
 enum State state = STATE_MENU;
 struct Menu* current_menu;
 GSFONT* font;
-const char* menu_help_text = NULL;
 
 const float BALL_INITIAL_POSITION[2] = {0.5f, 0.5f};
 const float BALL_INITIAL_VELOCITY[2] = {0.0075f, 0.0075f};
@@ -72,28 +71,40 @@ void game_reset_state() {
 }
 
 void game_render_menu(GSGLOBAL* gs_global) {
+    const float MENU_ITEM_FONT_SCALE = 2.0f;
     const float MENU_VERTICAL_STEP = 0.1f;
-    float y = 0.5f - ((current_menu->size / 2) * MENU_VERTICAL_STEP);
+    const float MENU_VERTICAL_INFO_OFFSET = 0.045f;
+
+    float y = 0.5f - (current_menu->size / 2) * MENU_VERTICAL_STEP;
 
     for (int i = 0; i < current_menu->size; i++) {
         const struct MenuItem* item = &current_menu->items[i];
+        bool selected = current_menu->selected == i;
 
-        u64 colour;
-
+        u64 colour = COLOUR_MENU_ITEM_DEFAULT;
         if (!item->enabled) {
             colour = COLOUR_MENU_ITEM_DISABLED;
-        } else if (current_menu->selected == i) {
+        } else if (selected) {
             colour = COLOUR_MENU_ITEM_SELECTED;
-        } else {
-            colour = COLOUR_MENU_ITEM_DEFAULT;
         }
 
-        render_text(gs_global, 0.5f, y, 2.0f, font, colour, item->name);
-        y += MENU_VERTICAL_STEP;
-    }
+        render_text(gs_global, 0.5f, y, MENU_ITEM_FONT_SCALE, font, colour, item->name);
 
-    if (menu_help_text) {
-        render_text(gs_global, 0.5, 0.9, 1.0f, font, COLOUR_MENU_ITEM_HELP, menu_help_text);
+        char info_buffer[64] = {0};
+        const char* info_text = NULL;
+
+        if (item->choices && item->enabled) {
+            snprintf(info_buffer, sizeof(info_buffer), "<< %s >>", menu_item_selected_option(item)->name);
+            info_text = info_buffer;
+        } else if (selected) {
+            info_text = menu_item_info_text(item);
+        }
+
+        if (info_text) {
+            render_text(gs_global, 0.5f, y + MENU_VERTICAL_INFO_OFFSET, 1.0f, font, selected ? COLOUR_MENU_ITEM_HELP : COLOUR_MENU_ITEM_DISABLED, info_text);
+        }
+
+        y += MENU_VERTICAL_STEP;
     }
 }
 
@@ -152,15 +163,11 @@ void game_update_menu_dependencies(Pad* pad_1, Pad* pad_2) {
         menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->enabled = !is_game_mode_time_limit;
 
     } else if (current_menu == get_main_menu()) {
-        bool is_second_pad_connected = pad_2->state == PAD_STATE_STABLE;
-
-        menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->enabled = is_second_pad_connected;
+        menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->enabled = pad_2->state == PAD_STATE_STABLE;
     }
 }
 
 void game_update_menu(Pad* pad_1, Pad* pad_2) {
-    menu_help_text = menu_build_help_text(&current_menu->items[current_menu->selected]);
-
     game_update_menu_dependencies(pad_1, pad_2);
 
     if (pad_button_pressed(pad_1, PAD_CROSS)) {

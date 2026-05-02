@@ -74,11 +74,13 @@ extern struct MenuChoice menu_choices_mode;
 extern struct MenuChoice menu_choices_difficulty;
 extern struct MenuChoice menu_choices_audio;
 
+const struct MenuOption* menu_item_selected_option(const struct MenuItem* item);
+
 enum MenuValue menu_choice_selected_value(const struct MenuChoice* choice);
 
 struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action);
 
-const char* menu_build_help_text(const struct MenuItem* item);
+const char* menu_item_info_text(const struct MenuItem* item);
 
 void menu_cycle_choice(struct MenuItem* item, int direction);
 

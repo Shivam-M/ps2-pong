@@ -104,45 +104,18 @@ struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action) {
     return NULL;
 }
 
-const char* menu_build_help_text(const struct MenuItem* item) {
-    static char buffer[64];
-
+const char* menu_item_info_text(const struct MenuItem* item) {
     switch (item->action) {
         case MENU_MAIN_PLAY_1P:
             return "Play vs AI - adjust difficulty in options";
-
         case MENU_MAIN_PLAY_2P:
             return "Local 1v1 - requires two controllers";
-
         case MENU_MAIN_OPTIONS:
             return "Change game mode, difficulty, and more";
-
         case MENU_OPTIONS_BACK:
             return "Return to the main menu";
-
-        case MENU_OPTIONS_MODE:
-            snprintf(buffer, sizeof(buffer), "<< GAME MODE: %s >>", menu_item_selected_option(item)->name);
-            return buffer;
-
-        case MENU_OPTIONS_END_SCORE:
-            snprintf(buffer, sizeof(buffer), "<< TARGET SCORE: %s >>", menu_item_selected_option(item)->name);
-            return buffer;
-
-        case MENU_OPTIONS_TIME_LIMIT:
-            snprintf(buffer, sizeof(buffer), "<< TIME LIMIT: %s >>", menu_item_selected_option(item)->name);
-            return buffer;
-
-        case MENU_OPTIONS_DIFFICULTY:
-            snprintf(buffer, sizeof(buffer), "<< DIFFICULTY: %s >>", menu_item_selected_option(item)->name);
-            return buffer;
-
         case MENU_OPTIONS_OFFSETS:
             return "Adjust screen horizontal/vertical offsets";
-
-        case MENU_OPTIONS_AUDIO:
-            snprintf(buffer, sizeof(buffer), "<< AUDIO: %s >>", menu_item_selected_option(item)->name);
-            return buffer;
-
         default:
             return NULL;
     }
