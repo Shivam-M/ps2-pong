@@ -5,9 +5,9 @@
 static struct Menu main_menu = {
     .selected = 1,
     .items = {
-        {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .enabled = false},
-        {"MULTIPLAYER", MENU_MAIN_PLAY_2P, .enabled = true},
-        {"OPTIONS", MENU_MAIN_OPTIONS, .enabled = true}
+        {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .disabled = true},
+        {"MULTIPLAYER", MENU_MAIN_PLAY_2P},
+        {"OPTIONS", MENU_MAIN_OPTIONS}
     },
     .back_action = MENU_NULL,
     .size = 3
@@ -68,13 +68,13 @@ struct MenuChoice menu_choices_audio = {
 static struct Menu options_menu = {
     .selected = 0,
     .items = {
-        {"GAME MODE", MENU_OPTIONS_MODE, .enabled = true, .choices = &menu_choices_mode},
-        {"TIME LIMIT", MENU_OPTIONS_TIME_LIMIT, .enabled = false, .choices = &menu_choices_time_limit},
-        {"SCORE LIMIT", MENU_OPTIONS_END_SCORE, .enabled = true, .choices = &menu_choices_score_limit},
-        {"DIFFICULTY", MENU_OPTIONS_DIFFICULTY, .enabled = true, .choices = &menu_choices_difficulty},
-        {"OFFSETS", MENU_OPTIONS_OFFSETS, .enabled = true},
-        {"AUDIO", MENU_OPTIONS_AUDIO, .enabled = true, .choices = &menu_choices_audio},
-        {"BACK", MENU_OPTIONS_BACK, .enabled = true}
+        {"GAME MODE", MENU_OPTIONS_MODE, .choices = &menu_choices_mode},
+        {"TIME LIMIT", MENU_OPTIONS_TIME_LIMIT, .disabled = true, .choices = &menu_choices_time_limit},
+        {"SCORE LIMIT", MENU_OPTIONS_END_SCORE, .choices = &menu_choices_score_limit},
+        {"DIFFICULTY", MENU_OPTIONS_DIFFICULTY, .choices = &menu_choices_difficulty},
+        {"OFFSETS", MENU_OPTIONS_OFFSETS},
+        {"AUDIO", MENU_OPTIONS_AUDIO, .choices = &menu_choices_audio},
+        {"BACK", MENU_OPTIONS_BACK}
     },
     .back_action = MENU_OPTIONS_BACK,
     .size = 7
@@ -131,7 +131,7 @@ void menu_cycle_choice(struct MenuItem* item, int direction) {
 void menu_cycle(struct Menu* menu, int direction) {
     do {
         menu->selected = (menu->selected + direction + menu->size) % menu->size;
-    } while (!menu->items[menu->selected].enabled);
+    } while (menu->items[menu->selected].disabled);
 }
 
 struct Menu* get_main_menu() {

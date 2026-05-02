@@ -48,7 +48,7 @@ enum MenuValue {
 struct MenuItem {
     const char* name;
     enum MenuAction action;
-    bool enabled;
+    bool disabled;
     struct MenuChoice* choices;
 };
 

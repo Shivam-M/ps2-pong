@@ -82,7 +82,7 @@ void game_render_menu(GSGLOBAL* gs_global) {
         bool selected = current_menu->selected == i;
 
         u64 colour = COLOUR_MENU_ITEM_DEFAULT;
-        if (!item->enabled) {
+        if (item->disabled) {
             colour = COLOUR_MENU_ITEM_DISABLED;
         } else if (selected) {
             colour = COLOUR_MENU_ITEM_SELECTED;
@@ -93,7 +93,7 @@ void game_render_menu(GSGLOBAL* gs_global) {
         char info_buffer[64] = {0};
         const char* info_text = NULL;
 
-        if (item->choices && item->enabled) {
+        if (item->choices && !item->disabled) {
             snprintf(info_buffer, sizeof(info_buffer), "<< %s >>", menu_item_selected_option(item)->name);
             info_text = info_buffer;
         } else if (selected) {
@@ -159,11 +159,11 @@ void game_update_menu_dependencies(Pad* pad_1, Pad* pad_2) {
     if (current_menu == get_options_menu()) {
         bool is_game_mode_time_limit = menu_choice_selected_value(&menu_choices_mode) == MENU_VALUE_MODE_TIME;
 
-        menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->enabled = is_game_mode_time_limit;
-        menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->enabled = !is_game_mode_time_limit;
+        menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->disabled = !is_game_mode_time_limit;
+        menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->disabled = is_game_mode_time_limit;
 
     } else if (current_menu == get_main_menu()) {
-        menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->enabled = pad_2->state == PAD_STATE_STABLE;
+        menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->disabled = pad_2->state != PAD_STATE_STABLE;
     }
 }
 
