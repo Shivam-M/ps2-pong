@@ -19,7 +19,8 @@ struct Settings {
 enum State {
     STATE_MENU,
     STATE_PAUSE,
-    STATE_PLAYING
+    STATE_PLAYING,
+    STATE_END
 };
 
 void game_render(GSGLOBAL* gs_global);

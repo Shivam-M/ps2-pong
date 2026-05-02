@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <debug.h>
+#include <time.h>
 
 #include "game.h"
 #include "pad.h"
@@ -32,6 +33,7 @@ int score[2] = {0, 0};
 char formatted_score[16] = "0 - 0";
 char subtitle[16] = {0};
 int remaining_time = 0;
+clock_t last_second_tick = 0;
 
 // #define DEBUG_GAME
 
@@ -44,6 +46,7 @@ void game_debug() {
     scr_printf("RIGHT PADDLE: %f\n", paddle_position_2[1]);
     scr_printf("SCORE: %d vs %d\n", score[0], score[1]);
     scr_printf("FONT: %p\n", font);
+    scr_printf("REMAINING TIME: %d\n", remaining_time);
 }
 #endif
 
@@ -93,6 +96,7 @@ void game_reset_state() {
     game_reset_ball();
 
     remaining_time = settings.time_limit;
+    last_second_tick = clock();
 
     paddle_position_1[1] = 0.5f;
     paddle_position_2[1] = 0.5f;
@@ -142,8 +146,9 @@ void game_render_menu(GSGLOBAL* gs_global) {
 }
 
 void game_render_pause(GSGLOBAL* gs_global) {
-    render_text(gs_global, 0.5f, 0.475f, 4.0f, font, COLOUR_RED, "PAUSED");
-    render_text(gs_global, 0.5f, 0.55f, 2.0f, font, COLOUR_RED, "PRESS START TO RESUME");
+    render_text(gs_global, 0.5f, 0.45f, 4.0f, font, COLOUR_RED, "PAUSED");
+    render_text(gs_global, 0.5f, 0.53f, 2.0f, font, COLOUR_DARK_GREY, "[START] RESUME");
+    render_text(gs_global, 0.5f, 0.585f, 2.0f, font, COLOUR_DARK_GREY, "[SELECT] RETURN TO MENU");
 }
 
 void game_render_gameplay(GSGLOBAL* gs_global) {
@@ -158,6 +163,20 @@ void game_render_gameplay(GSGLOBAL* gs_global) {
     render_quad(gs_global, ball_position[0], ball_position[1], BALL_SIZE[0], BALL_SIZE[1], COLOUR_GAME_FOREGROUND);
 }
 
+void game_render_end(GSGLOBAL* gs_global) {
+    const char* winner_text = "TIE";
+
+    if (score[0] > score[1]) {
+        winner_text = "PLAYER 1 WINS!";
+    } else if (score[1] > score[0]) {
+        winner_text = "PLAYER 2 WINS!";
+    }
+
+    render_text(gs_global, 0.5f, 0.45f, 4.0f, font, COLOUR_GREEN, winner_text);
+    render_text(gs_global, 0.5f, 0.53f, 2.0f, font, COLOUR_DARK_GREY, "[START] PLAY AGAIN");
+    render_text(gs_global, 0.5f, 0.585f, 2.0f, font, COLOUR_DARK_GREY, "[SELECT] RETURN TO MENU");
+}
+
 void game_render(GSGLOBAL* gs_global) {
     switch (state) {
         case STATE_PLAYING:
@@ -169,6 +188,10 @@ void game_render(GSGLOBAL* gs_global) {
             break;
         case STATE_MENU:
             game_render_menu(gs_global);
+            break;
+        case STATE_END:
+            game_render_gameplay(gs_global);
+            game_render_end(gs_global);
             break;
     }
 }
@@ -283,6 +306,17 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
     }
 
     if (settings.game_mode == MENU_VALUE_MODE_TIME) {
+        clock_t now = clock();
+
+        if (now - last_second_tick >= CLOCKS_PER_SEC) {
+            last_second_tick += CLOCKS_PER_SEC;
+
+            if (--remaining_time <= 0) {
+                state = STATE_END;
+                return;
+            }
+        }
+
         snprintf(subtitle, sizeof(subtitle), "%s", get_time_from_seconds(remaining_time));
     }
 
@@ -293,9 +327,18 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
     ball_position[1] += ball_velocity[1];
 
     if (ball_position[0] < 0.f || ball_position[0] > 1.f) {
-        score[ball_position[0] < 0.f ? 1 : 0]++;
+        int scoring_player = ball_position[0] < 0.f ? 1 : 0;
+
+        score[scoring_player]++;
+
         snprintf(formatted_score, sizeof(formatted_score), "%d - %d", score[0], score[1]);
+
         game_reset_ball();
+
+        if (settings.game_mode == MENU_VALUE_MODE_SCORE && score[scoring_player] >= settings.score_limit) {
+            state = STATE_END;
+        }
+
         return;
     }
 
@@ -316,6 +359,19 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
     #endif
 }
 
+void game_update_end(Pad* pad_1, Pad* pad_2) {
+    if (pad_button_pressed(pad_1, PAD_START)) {
+        game_reset_state();
+        state = STATE_PLAYING;
+        return;
+    }
+
+    if (pad_button_pressed(pad_1, PAD_SELECT)) {
+        state = STATE_MENU;
+        return;
+    }
+}
+
 void game_update(Pad* pad_1, Pad* pad_2) {
     switch (state) {
         case STATE_PLAYING:
@@ -327,6 +383,9 @@ void game_update(Pad* pad_1, Pad* pad_2) {
         case STATE_MENU:
             game_update_menu(pad_1, pad_2);
             break;
+        case STATE_END:
+            game_update_end(pad_1, pad_2);
+            break;
     }
 }
 
@@ -336,6 +395,4 @@ void game_initialise(GSGLOBAL* gs_global, u64* background_colour) {
     font = load_font(gs_global, "fonts/press-start-2p.bmp");
 
     current_menu = get_main_menu();
-
-    game_reset_ball();
 }
