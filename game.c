@@ -97,7 +97,7 @@ void game_render_menu(GSGLOBAL* gs_global) {
             snprintf(info_buffer, sizeof(info_buffer), "<< %s >>", menu_item_selected_option(item)->name);
             info_text = info_buffer;
         } else if (selected) {
-            info_text = menu_item_info_text(item);
+            info_text = item->info;
         }
 
         if (info_text) {

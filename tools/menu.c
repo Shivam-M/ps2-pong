@@ -5,9 +5,9 @@
 static struct Menu main_menu = {
     .selected = 1,
     .items = {
-        {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .disabled = true},
-        {"MULTIPLAYER", MENU_MAIN_PLAY_2P},
-        {"OPTIONS", MENU_MAIN_OPTIONS}
+        {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .disabled = true, .info = "Play vs AI - adjust difficulty in options"},
+        {"MULTIPLAYER", MENU_MAIN_PLAY_2P, .info = "Local 1v1 - requires two controllers"},
+        {"OPTIONS", MENU_MAIN_OPTIONS, .info = "Change game mode, difficulty, and more"}
     },
     .back_action = MENU_NULL,
     .size = 3
@@ -72,9 +72,9 @@ static struct Menu options_menu = {
         {"TIME LIMIT", MENU_OPTIONS_TIME_LIMIT, .disabled = true, .choices = &menu_choices_time_limit},
         {"SCORE LIMIT", MENU_OPTIONS_END_SCORE, .choices = &menu_choices_score_limit},
         {"DIFFICULTY", MENU_OPTIONS_DIFFICULTY, .choices = &menu_choices_difficulty},
-        {"OFFSETS", MENU_OPTIONS_OFFSETS},
+        {"OFFSETS", MENU_OPTIONS_OFFSETS, .info = "Adjust screen horizontal/vertical offsets"},
         {"AUDIO", MENU_OPTIONS_AUDIO, .choices = &menu_choices_audio},
-        {"BACK", MENU_OPTIONS_BACK}
+        {"BACK", MENU_OPTIONS_BACK, .info = "Return to the main menu"}
     },
     .back_action = MENU_OPTIONS_BACK,
     .size = 7
@@ -102,23 +102,6 @@ struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action) {
     }
 
     return NULL;
-}
-
-const char* menu_item_info_text(const struct MenuItem* item) {
-    switch (item->action) {
-        case MENU_MAIN_PLAY_1P:
-            return "Play vs AI - adjust difficulty in options";
-        case MENU_MAIN_PLAY_2P:
-            return "Local 1v1 - requires two controllers";
-        case MENU_MAIN_OPTIONS:
-            return "Change game mode, difficulty, and more";
-        case MENU_OPTIONS_BACK:
-            return "Return to the main menu";
-        case MENU_OPTIONS_OFFSETS:
-            return "Adjust screen horizontal/vertical offsets";
-        default:
-            return NULL;
-    }
 }
 
 void menu_cycle_choice(struct MenuItem* item, int direction) {

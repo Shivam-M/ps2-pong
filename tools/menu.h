@@ -49,6 +49,7 @@ struct MenuItem {
     const char* name;
     enum MenuAction action;
     bool disabled;
+    const char* info;
     struct MenuChoice* choices;
 };
 
@@ -79,8 +80,6 @@ const struct MenuOption* menu_item_selected_option(const struct MenuItem* item);
 enum MenuValue menu_choice_selected_value(const struct MenuChoice* choice);
 
 struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action);
-
-const char* menu_item_info_text(const struct MenuItem* item);
 
 void menu_cycle_choice(struct MenuItem* item, int direction);
 
