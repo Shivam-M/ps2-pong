@@ -29,4 +29,6 @@ void game_update(Pad* pad_1, Pad* pad_2);
 
 void game_initialise(GSGLOBAL* gs_global, u64* background_colour);
 
+void game_shutdown();
+
 #endif

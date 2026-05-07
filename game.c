@@ -10,10 +10,14 @@
 #include "menu.h"
 #include "colours.h"
 #include "utils.h"
+#include "audio.h"
 
 enum State state = STATE_MENU;
 struct Settings settings = {0};
 struct Menu* current_menu;
+struct Sound* sound_beep;
+struct Sound* sound_end;
+struct Sound* current_sound;
 GSFONT* font;
 
 const float BALL_INITIAL_POSITION[2] = {0.5f, 0.5f};
@@ -49,6 +53,23 @@ void game_debug() {
     scr_printf("REMAINING TIME: %d\n", remaining_time);
 }
 #endif
+
+void game_play_audio(struct Sound* sound) {
+    if (current_sound) {
+        audio_stop(current_sound);
+    }
+
+    if (settings.audio && sound) {
+        current_sound = sound;
+        audio_play(sound);
+    }
+}
+
+void game_update_audio() {
+    if (settings.audio && current_sound) {
+        audio_update(current_sound);
+    }
+}
 
 void game_load_settings() {
     settings.audio = menu_choice_selected_option(&menu_choices_audio)->value == MENU_VALUE_AUDIO_ON;
@@ -94,6 +115,7 @@ void game_reset_ball() {
 void game_reset_state() {
     game_load_settings();
     game_reset_ball();
+    game_play_audio(NULL);
 
     remaining_time = settings.time_limit;
     last_second_tick = clock();
@@ -312,6 +334,7 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
             last_second_tick += CLOCKS_PER_SEC;
 
             if (--remaining_time <= 0) {
+                game_play_audio(sound_end);
                 state = STATE_END;
                 return;
             }
@@ -336,6 +359,7 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
         game_reset_ball();
 
         if (settings.game_mode == MENU_VALUE_MODE_SCORE && score[scoring_player] >= settings.score_limit) {
+            game_play_audio(sound_end);
             state = STATE_END;
         }
 
@@ -350,6 +374,8 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
     float relative_hit = 0.f;
 
     if (get_paddle_relative_hit(ball_velocity[0] < 0.0f ? paddle_position_1 : paddle_position_2, &relative_hit)) {
+        game_play_audio(sound_beep);
+
         ball_velocity[0] *= -1 - (PADDLE_HIT_EDGE_FACTOR * fabsf(relative_hit - 0.5f));
         ball_velocity[0] = fminf(fmaxf(ball_velocity[0], -BALL_MAX_HORIZONTAL_VELOCITY), BALL_MAX_HORIZONTAL_VELOCITY);
     }
@@ -387,12 +413,21 @@ void game_update(Pad* pad_1, Pad* pad_2) {
             game_update_end(pad_1, pad_2);
             break;
     }
+
+    game_update_audio();
 }
 
 void game_initialise(GSGLOBAL* gs_global, u64* background_colour) {
     *background_colour = COLOUR_BLACK;
 
     font = load_font(gs_global, "fonts/press-start-2p.bmp");
+    sound_beep = audio_load("sounds/beep.wav");
+    sound_end = audio_load("sounds/evil-laughter.wav");
 
     current_menu = get_main_menu();
+}
+
+void game_shutdown() {
+    audio_free(sound_beep);
+    audio_free(sound_end);
 }

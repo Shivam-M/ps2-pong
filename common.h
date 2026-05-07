@@ -6,4 +6,6 @@
 #define GS_HEIGHT 448
 #define GS_MODE GS_MODE_NTSC
 
+#define AUDIO_CHUNK_SIZE 2048
+
 #endif

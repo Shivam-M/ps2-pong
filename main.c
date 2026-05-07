@@ -11,6 +11,7 @@
 #include "pad.h"
 #include "render.h"
 #include "game.h"
+#include "audio.h"
 
 // #define DEBUG_PADS
 
@@ -60,6 +61,8 @@ int main() {
 
     initialise_pads();
 
+    audio_initialise();
+
     GSGLOBAL* gs_global = initialise_graphics();
 
     u64 background_colour = GS_SETREG_RGBAQ(128, 128, 128, 0, 0);
@@ -84,6 +87,8 @@ int main() {
         gsKit_queue_exec(gs_global);
         gsKit_sync_flip(gs_global);
     }
+
+    game_shutdown();
 
     return 0;
 }
