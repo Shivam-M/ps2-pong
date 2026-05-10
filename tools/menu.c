@@ -1,6 +1,11 @@
 #include "menu.h"
+#include "render.h"
+#include "colours.h"
+#include "common.h"
 
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static struct Menu main_menu = {
     .selected = 1,
@@ -81,6 +86,70 @@ static struct Menu options_menu = {
     .size = 7
 };
 
+struct MenuChoice menu_choices_offsets_horizontal = {
+    .selected = 5,
+    .options = {
+        {"-10", MENU_NULL},
+        {"-8", MENU_NULL},
+        {"-6", MENU_NULL},
+        {"-4", MENU_NULL},
+        {"-2", MENU_NULL},
+        {"0", MENU_NULL},
+        {"2", MENU_NULL},
+        {"4", MENU_NULL},
+        {"6", MENU_NULL},
+        {"8", MENU_NULL},
+        {"10", MENU_NULL},
+    },
+    .size = 11
+};
+
+struct MenuChoice menu_choices_offsets_vertical = {
+    .selected = 5,
+    .options = {
+        {"-10", MENU_NULL},
+        {"-8", MENU_NULL},
+        {"-6", MENU_NULL},
+        {"-4", MENU_NULL},
+        {"-2", MENU_NULL},
+        {"0", MENU_NULL},
+        {"2", MENU_NULL},
+        {"4", MENU_NULL},
+        {"6", MENU_NULL},
+        {"8", MENU_NULL},
+        {"10", MENU_NULL},
+    },
+    .size = 11
+};
+
+void render_offsets_menu(GSGLOBAL* gs_global) {
+    render_quad(gs_global, 0.5f, 0.5f, 1.00f, 1.00f, COLOUR_RED);
+    render_quad(gs_global, 0.5f, 0.5f, 0.95f, 0.95f, COLOUR_GREEN);
+    render_quad(gs_global, 0.5f, 0.5f, 0.90f, 0.90f, COLOUR_BLUE);
+    render_quad(gs_global, 0.5f, 0.5f, 0.85f, 0.85f, COLOUR_BLACK);
+}
+
+void on_change_offsets_menu(struct MenuItem* item) {
+    if (item->action == MENU_OFFSETS_HORIZONTAL) {
+        render_offsets[0] = atoi(menu_item_selected_option(item)->name);
+    } else if (item->action == MENU_OFFSETS_VERTICAL) {
+        render_offsets[1] = atoi(menu_item_selected_option(item)->name);
+    }
+}
+
+static struct Menu offsets_menu = {
+    .selected = 0,
+    .items = {
+        {"HORIZONTAL", MENU_OFFSETS_HORIZONTAL, .choices = &menu_choices_offsets_horizontal, .on_change = &on_change_offsets_menu, .flags = MENU_FLAG_NO_CYCLE},
+        {"VERTICAL", MENU_OFFSETS_VERTICAL, .choices = &menu_choices_offsets_vertical, .on_change = &on_change_offsets_menu, .flags = MENU_FLAG_NO_CYCLE},
+        {"BACK", MENU_OFFSETS_BACK, .info = "Return to the options menu"}
+    },
+    .back_action = MENU_OFFSETS_BACK,
+    .flags = MENU_FLAG_RENDER_CUSTOM,
+    .custom_render_callback = &render_offsets_menu,
+    .size = 3
+};
+
 const struct MenuOption NULL_OPTION = {"NULL", MENU_VALUE_NULL};
 
 const struct MenuOption* menu_item_selected_option(const struct MenuItem* item) {
@@ -88,7 +157,7 @@ const struct MenuOption* menu_item_selected_option(const struct MenuItem* item) 
 }
 
 const struct MenuOption* menu_choice_selected_option(const struct MenuChoice* choice) {
-    if (!choice) return MENU_VALUE_NULL;
+    if (!choice) return &NULL_OPTION;
 
     return &choice->options[choice->selected];
 }
@@ -106,7 +175,15 @@ struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action) {
 void menu_cycle_choice(struct MenuItem* item, int direction) {
     if (item->choices == NULL) return;
 
-    item->choices->selected = (item->choices->selected + direction + item->choices->size) % item->choices->size;
+    if (item->flags & MENU_FLAG_NO_CYCLE) {
+        item->choices->selected = MAX(0, MIN(item->choices->selected + direction, item->choices->size - 1));
+    } else {
+        item->choices->selected = (item->choices->selected + direction + item->choices->size) % item->choices->size;
+    }
+
+    if (item->on_change) {
+        item->on_change(item);
+    }
 }
 
 // should really validate that all items aren't disabled (even if it is very unlikely)
@@ -122,4 +199,8 @@ struct Menu* get_main_menu() {
 
 struct Menu* get_options_menu() {
     return &options_menu;
+}
+
+struct Menu* get_offsets_menu() {
+    return &offsets_menu;
 }

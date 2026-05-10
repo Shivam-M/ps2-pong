@@ -5,13 +5,15 @@
 #include <gsToolkit.h>
 #include <string.h>
 
+int render_offsets[2] = {0};
+
 void render_quad(GSGLOBAL* gs_global, float x, float y, float width, float height, u64 colour) {
     gsKit_prim_sprite(
         gs_global,
-        (x - width * 0.5f) * GS_WIDTH,
-        (y - height * 0.5f) * GS_HEIGHT,
-        (x + width * 0.5f) * GS_WIDTH,
-        (y + height * 0.5f) * GS_HEIGHT,
+        ((x - width * 0.5f) * GS_WIDTH) + render_offsets[0],
+        ((y - height * 0.5f) * GS_HEIGHT) + render_offsets[1],
+        ((x + width * 0.5f) * GS_WIDTH) + render_offsets[0],
+        ((y + height * 0.5f) * GS_HEIGHT) + render_offsets[1],
         0,
         colour
     );
@@ -24,8 +26,8 @@ void render_text(GSGLOBAL* gs_global, float x, float y, float scale, GSFONT* fon
     gsKit_font_print_scaled(
         gs_global,
         font,
-        (x - width * 0.5f) * GS_WIDTH,
-        (y - height * 0.5f) * GS_HEIGHT,
+        ((x - width * 0.5f) * GS_WIDTH) + render_offsets[0],
+        ((y - height * 0.5f) * GS_HEIGHT) + render_offsets[1],
         0,
         scale,
         colour,

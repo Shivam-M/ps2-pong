@@ -1,6 +1,7 @@
 #ifndef __MENU_H__
 #define __MENU_H__
 
+#include <gsKit.h>
 #include <stdbool.h>
 
 enum MenuAction {
@@ -16,7 +17,11 @@ enum MenuAction {
     MENU_OPTIONS_DIFFICULTY,
     MENU_OPTIONS_OFFSETS,
     MENU_OPTIONS_AUDIO,
-    MENU_OPTIONS_BACK
+    MENU_OPTIONS_BACK,
+
+    MENU_OFFSETS_HORIZONTAL,
+    MENU_OFFSETS_VERTICAL,
+    MENU_OFFSETS_BACK
 };
 
 enum MenuValue {
@@ -46,11 +51,19 @@ enum MenuValue {
     MENU_VALUE_AUDIO_OFF
 };
 
+enum MenuFlags {
+    MENU_FLAG_RENDER_SKIP           = 1 << 0,
+    MENU_FLAG_RENDER_CUSTOM         = 1 << 1,
+    MENU_FLAG_NO_CYCLE              = 1 << 2
+};
+
 struct MenuItem {
     const char* name;
     enum MenuAction action;
     bool disabled;
     const char* info;
+    void (*on_change)(struct MenuItem*);
+    enum MenuFlags flags;
     struct MenuChoice* choices;
 };
 
@@ -69,6 +82,8 @@ struct Menu {
     int selected;
     int size;
     enum MenuAction back_action;
+    enum MenuFlags flags;
+    void (*custom_render_callback)(GSGLOBAL*);
     struct MenuItem items[];
 };
 
@@ -77,6 +92,8 @@ extern struct MenuChoice menu_choices_time_limit;
 extern struct MenuChoice menu_choices_score_limit;
 extern struct MenuChoice menu_choices_difficulty;
 extern struct MenuChoice menu_choices_audio;
+extern struct MenuChoice menu_choices_offsets_horizontal;
+extern struct MenuChoice menu_choices_offsets_vertical;
 
 const struct MenuOption* menu_item_selected_option(const struct MenuItem* item);
 
@@ -91,5 +108,7 @@ void menu_cycle(struct Menu* menu, int direction);
 struct Menu* get_main_menu();
 
 struct Menu* get_options_menu();
+
+struct Menu* get_offsets_menu();
 
 #endif

@@ -6,6 +6,8 @@
 
 #include "common.h"
 
+extern int render_offsets[2];
+
 void render_quad(GSGLOBAL* gs_global, float x, float y, float width, float height, u64 colour);
 
 void render_text(GSGLOBAL* gs_global, float x, float y, float scale, GSFONT* font, u64 colour, const char* text);

@@ -1,9 +1,3 @@
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <debug.h>
-#include <time.h>
-
 #include "game.h"
 #include "pad.h"
 #include "render.h"
@@ -11,6 +5,12 @@
 #include "colours.h"
 #include "utils.h"
 #include "audio.h"
+
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <debug.h>
+#include <time.h>
 
 enum State state = STATE_MENU;
 struct Settings settings = {0};
@@ -130,6 +130,10 @@ void game_reset_state() {
 }
 
 void game_render_menu(GSGLOBAL* gs_global) {
+    if (current_menu->flags & MENU_FLAG_RENDER_CUSTOM && current_menu->custom_render_callback) {
+        current_menu->custom_render_callback(gs_global);
+    }
+
     const float MENU_ITEM_FONT_SCALE = 2.0f;
     const float MENU_VERTICAL_STEP = 0.1f;
     const float MENU_VERTICAL_INFO_OFFSET = 0.045f;
@@ -233,6 +237,14 @@ void game_invoke_menu_action(enum MenuAction action) {
             break;
         case MENU_OPTIONS_BACK:
             current_menu = get_main_menu();
+            break;
+        case MENU_OPTIONS_OFFSETS:
+            current_menu = get_offsets_menu();
+            break;
+        case MENU_OFFSETS_BACK:
+            current_menu = get_options_menu();
+            break;
+        default:
             break;
     }
 }
