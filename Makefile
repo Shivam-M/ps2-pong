@@ -1,7 +1,7 @@
 EE_BIN = pong.elf
-EE_OBJS = main.o game.o tools/pad.o tools/render.o tools/menu.o tools/utils.o tools/audio.o
-EE_LIBS = -laudsrv -lgskit_toolkit -lgskit -ldmakit -lpad -ldebug
-EE_CFLAGS = -I. -I./tools -I$(PS2DEV)/gsKit/include
+EE_OBJS = main.o game.o tools/pad.o tools/render.o tools/menu.o tools/utils.o tools/audio.o irx/audsrv_irx.o
+EE_LIBS = -laudsrv -lgskit_toolkit -lgskit -ldmakit -lpad -ldebug -lpatches
+EE_CFLAGS = -I. -I./tools -I./irx -I$(PS2DEV)/gsKit/include
 EE_LDFLAGS = -L$(PS2DEV)/gsKit/lib
 
 include $(PS2SDK)/samples/Makefile.pref

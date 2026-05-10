@@ -1,5 +1,6 @@
 #include "audio.h"
 #include "common.h"
+#include "audsrv_irx.h"
 
 #include <audsrv.h>
 #include <tamtypes.h>
@@ -10,12 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-void audio_initialise() {
-    SifInitRpc(0);
-
+void audio_initialise(void)  {
     SifLoadModule("rom0:LIBSD", 0, NULL);
-    SifLoadModule("rom0:SDRDRV", 0, NULL);
-    SifLoadModule("host:irx/audsrv.irx", 0, NULL);
+
+    SifExecModuleBuffer(audsrv_irx, audsrv_irx_length, 0, NULL, NULL);
 
     audsrv_init();
 }

@@ -1,17 +1,18 @@
+#include "common.h"
+#include "pad.h"
+#include "render.h"
+#include "game.h"
+#include "audio.h"
+
 #include <gsKit.h>
 #include <dmaKit.h>
 #include <sifrpc.h>
 #include <loadfile.h>
 #include <libpad.h>
 #include <debug.h>
-#include <stdlib.h>
 #include <time.h>
-
-#include "common.h"
-#include "pad.h"
-#include "render.h"
-#include "game.h"
-#include "audio.h"
+#include <sbv_patches.h>
+#include <stdlib.h>
 
 // #define DEBUG_PADS
 
@@ -31,8 +32,6 @@ void update_pads() {
 }
 
 void initialise_pads() {
-    SifInitRpc(0);
-
     SifLoadModule("rom0:SIO2MAN", 0, NULL);
     SifLoadModule("rom0:PADMAN", 0, NULL);
 
@@ -56,8 +55,16 @@ GSGLOBAL* initialise_graphics() {
     return gs_global;
 }
 
+void initialise_system() {
+    SifInitRpc(0);
+
+    sbv_patch_enable_lmb();
+}
+
 int main() {
     init_scr();
+
+    initialise_system();
 
     initialise_pads();
 
