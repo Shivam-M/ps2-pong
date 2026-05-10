@@ -49,6 +49,7 @@ GSGLOBAL* initialise_graphics() {
     gs_global->Mode = GS_MODE;
     gs_global->Width = GS_WIDTH;
     gs_global->Height = GS_HEIGHT;
+    gs_global->ZBuffering = GS_SETTING_OFF;
 
     gsKit_init_screen(gs_global);
 
