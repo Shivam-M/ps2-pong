@@ -233,16 +233,16 @@ void game_invoke_menu_action(enum MenuAction action) {
             state = STATE_PLAYING;
             break;
         case MENU_MAIN_OPTIONS:
-            current_menu = get_options_menu();
+            current_menu = &menu_options;
             break;
         case MENU_OPTIONS_BACK:
-            current_menu = get_main_menu();
+            current_menu = &menu_main;
             break;
         case MENU_OPTIONS_OFFSETS:
-            current_menu = get_offsets_menu();
+            current_menu = &menu_offsets;
             break;
         case MENU_OFFSETS_BACK:
-            current_menu = get_options_menu();
+            current_menu = &menu_options;
             break;
         default:
             break;
@@ -250,13 +250,13 @@ void game_invoke_menu_action(enum MenuAction action) {
 }
 
 void game_update_menu_dependencies(Pad* pad_1, Pad* pad_2) {
-    if (current_menu == get_options_menu()) {
+    if (current_menu == &menu_options) {
         enum MenuValue game_mode = menu_choice_selected_option(&menu_choices_mode)->value;
 
         menu_find_item(current_menu, MENU_OPTIONS_TIME_LIMIT)->disabled = game_mode != MENU_VALUE_MODE_TIME;
         menu_find_item(current_menu, MENU_OPTIONS_END_SCORE)->disabled = game_mode != MENU_VALUE_MODE_SCORE;
 
-    } else if (current_menu == get_main_menu()) {
+    } else if (current_menu == &menu_main) {
         menu_find_item(current_menu, MENU_MAIN_PLAY_2P)->disabled = pad_2->state != PAD_STATE_STABLE;
     }
 }
@@ -436,7 +436,7 @@ void game_initialise(GSGLOBAL* gs_global, u64* background_colour) {
     sound_beep = audio_load("sounds/beep.wav");
     sound_end = audio_load("sounds/evil-laughter.wav");
 
-    current_menu = get_main_menu();
+    current_menu = &menu_main;
 }
 
 void game_shutdown() {

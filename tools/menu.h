@@ -95,6 +95,10 @@ extern struct MenuChoice menu_choices_audio;
 extern struct MenuChoice menu_choices_offsets_horizontal;
 extern struct MenuChoice menu_choices_offsets_vertical;
 
+extern struct Menu menu_main;
+extern struct Menu menu_options;
+extern struct Menu menu_offsets;
+
 const struct MenuOption* menu_item_selected_option(const struct MenuItem* item);
 
 const struct MenuOption* menu_choice_selected_option(const struct MenuChoice* choice);
@@ -104,11 +108,5 @@ struct MenuItem* menu_find_item(struct Menu* menu, enum MenuAction action);
 void menu_cycle_choice(struct MenuItem* item, int direction);
 
 void menu_cycle(struct Menu* menu, int direction);
-
-struct Menu* get_main_menu();
-
-struct Menu* get_options_menu();
-
-struct Menu* get_offsets_menu();
 
 #endif

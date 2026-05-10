@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static struct Menu main_menu = {
+struct Menu menu_main = {
     .selected = 1,
     .items = {
         {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .disabled = true, .info = "Play vs AI - adjust difficulty in options"},
@@ -71,7 +71,7 @@ struct MenuChoice menu_choices_audio = {
     .size = 2
 };
 
-static struct Menu options_menu = {
+struct Menu menu_options = {
     .selected = 0,
     .items = {
         {"GAME MODE", MENU_OPTIONS_MODE, .choices = &menu_choices_mode},
@@ -122,14 +122,14 @@ struct MenuChoice menu_choices_offsets_vertical = {
     .size = 11
 };
 
-void render_offsets_menu(GSGLOBAL* gs_global) {
+void menu_render_offsets(GSGLOBAL* gs_global) {
     render_quad(gs_global, 0.5f, 0.5f, 1.00f, 1.00f, COLOUR_RED);
     render_quad(gs_global, 0.5f, 0.5f, 0.95f, 0.95f, COLOUR_GREEN);
     render_quad(gs_global, 0.5f, 0.5f, 0.90f, 0.90f, COLOUR_BLUE);
     render_quad(gs_global, 0.5f, 0.5f, 0.85f, 0.85f, COLOUR_BLACK);
 }
 
-void on_change_offsets_menu(struct MenuItem* item) {
+void menu_on_change_offsets(struct MenuItem* item) {
     if (item->action == MENU_OFFSETS_HORIZONTAL) {
         render_offsets[0] = atoi(menu_item_selected_option(item)->name);
     } else if (item->action == MENU_OFFSETS_VERTICAL) {
@@ -137,27 +137,27 @@ void on_change_offsets_menu(struct MenuItem* item) {
     }
 }
 
-static struct Menu offsets_menu = {
+struct Menu menu_offsets = {
     .selected = 0,
     .items = {
-        {"HORIZONTAL", MENU_OFFSETS_HORIZONTAL, .choices = &menu_choices_offsets_horizontal, .on_change = &on_change_offsets_menu, .flags = MENU_FLAG_NO_CYCLE},
-        {"VERTICAL", MENU_OFFSETS_VERTICAL, .choices = &menu_choices_offsets_vertical, .on_change = &on_change_offsets_menu, .flags = MENU_FLAG_NO_CYCLE},
+        {"HORIZONTAL", MENU_OFFSETS_HORIZONTAL, .choices = &menu_choices_offsets_horizontal, .on_change = &menu_on_change_offsets, .flags = MENU_FLAG_NO_CYCLE},
+        {"VERTICAL", MENU_OFFSETS_VERTICAL, .choices = &menu_choices_offsets_vertical, .on_change = &menu_on_change_offsets, .flags = MENU_FLAG_NO_CYCLE},
         {"BACK", MENU_OFFSETS_BACK, .info = "Return to the options menu"}
     },
     .back_action = MENU_OFFSETS_BACK,
     .flags = MENU_FLAG_RENDER_CUSTOM,
-    .custom_render_callback = &render_offsets_menu,
+    .custom_render_callback = &menu_render_offsets,
     .size = 3
 };
 
-const struct MenuOption NULL_OPTION = {"NULL", MENU_VALUE_NULL};
+const struct MenuOption MENU_NULL_OPTION = {"NULL", MENU_VALUE_NULL};
 
 const struct MenuOption* menu_item_selected_option(const struct MenuItem* item) {
     return menu_choice_selected_option(item->choices);
 }
 
 const struct MenuOption* menu_choice_selected_option(const struct MenuChoice* choice) {
-    if (!choice) return &NULL_OPTION;
+    if (!choice) return &MENU_NULL_OPTION;
 
     return &choice->options[choice->selected];
 }
@@ -191,16 +191,4 @@ void menu_cycle(struct Menu* menu, int direction) {
     do {
         menu->selected = (menu->selected + direction + menu->size) % menu->size;
     } while (menu->items[menu->selected].disabled);
-}
-
-struct Menu* get_main_menu() {
-    return &main_menu;
-}
-
-struct Menu* get_options_menu() {
-    return &options_menu;
-}
-
-struct Menu* get_offsets_menu() {
-    return &offsets_menu;
 }
