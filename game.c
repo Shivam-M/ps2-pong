@@ -71,9 +71,35 @@ void game_update_audio() {
     }
 }
 
+struct AIDifficulty game_configure_ai_difficulty(enum MenuValue difficulty_value) {
+    struct AIDifficulty difficulty = {0};
+
+    switch (difficulty_value) {
+        case MENU_VALUE_DIFFICULTY_EASY:
+            difficulty.speed_multiplier = 0.8f;
+            difficulty.detection_range = 0.25f;
+            break;
+        case MENU_VALUE_DIFFICULTY_MEDIUM:
+        default:
+            difficulty.speed_multiplier = 0.9f;
+            difficulty.detection_range = 0.35f;
+            break;
+        case MENU_VALUE_DIFFICULTY_HARD:
+            difficulty.speed_multiplier = 1.0f;
+            difficulty.detection_range = 0.45f;
+            break;
+    }
+
+    return difficulty;
+}
+
 void game_load_settings() {
     settings.audio = menu_choice_selected_option(&menu_choices_audio)->value == MENU_VALUE_AUDIO_ON;
     settings.game_mode = menu_choice_selected_option(&menu_choices_mode)->value;
+
+    if (settings.singleplayer) {
+        settings.difficulty = game_configure_ai_difficulty(menu_choice_selected_option(&menu_choices_difficulty)->value);
+    }
 
     if (settings.game_mode == MENU_VALUE_MODE_TIME) {
         settings.time_limit = get_seconds_from_time(menu_choice_selected_option(&menu_choices_time_limit)->name);
@@ -225,12 +251,14 @@ void game_render(GSGLOBAL* gs_global) {
 void game_invoke_menu_action(enum MenuAction action) {
     switch (action) {
         case MENU_MAIN_PLAY_1P:
-            game_reset_state();
+            settings.singleplayer = true;
             state = STATE_PLAYING;
+            game_reset_state();
             break;
         case MENU_MAIN_PLAY_2P:
-            game_reset_state();
+            settings.singleplayer = false;
             state = STATE_PLAYING;
+            game_reset_state();
             break;
         case MENU_MAIN_OPTIONS:
             current_menu = &menu_options;
@@ -322,6 +350,22 @@ bool get_paddle_relative_hit(float paddle_position[2], float* relative_hit) {
     return false;
 }
 
+void game_update_paddle_ai(float paddle_position[2]) {
+    float ball_vertical_position = ball_position[1];
+
+    if (fabs(ball_position[0] - paddle_position[0]) > settings.difficulty.detection_range) {
+        return;
+    }
+
+    if (paddle_position[1] < ball_vertical_position) {
+        paddle_position[1] += PADDLE_MOVEMENT_SPEED * settings.difficulty.speed_multiplier;
+    } else if (paddle_position[1] > ball_vertical_position) {
+        paddle_position[1] -= PADDLE_MOVEMENT_SPEED * settings.difficulty.speed_multiplier;
+    }
+
+    paddle_position[1] = fminf(fmaxf(paddle_position[1], 0.0f), 1.0f);
+}
+
 void game_update_paddle(Pad* pad, float paddle_position[2]) {
     if (pad_button_down(pad, PAD_UP)) {
         paddle_position[1] -= PADDLE_MOVEMENT_SPEED;
@@ -356,7 +400,12 @@ void game_update_gameplay(Pad* pad_1, Pad* pad_2) {
     }
 
     game_update_paddle(pad_1, paddle_position_1);
-    game_update_paddle(pad_2, paddle_position_2);
+
+    if (settings.singleplayer) {
+        game_update_paddle_ai(paddle_position_2);
+    } else {
+        game_update_paddle(pad_2, paddle_position_2);
+    }
 
     ball_position[0] += ball_velocity[0];
     ball_position[1] += ball_velocity[1];

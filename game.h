@@ -6,14 +6,21 @@
 #include "pad.h"
 #include "menu.h"
 
+struct AIDifficulty {
+    float speed_multiplier;
+    float detection_range;
+};
+
 struct Settings {
     enum MenuValue game_mode;
+    struct AIDifficulty difficulty;
     union {
         int time_limit;
         int score_limit;
     };
     int offsets[2];
     bool audio;
+    bool singleplayer;
 };
 
 enum State {

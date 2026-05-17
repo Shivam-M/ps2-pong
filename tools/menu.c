@@ -10,7 +10,7 @@
 struct Menu menu_main = {
     .selected = 1,
     .items = {
-        {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .disabled = true, .info = "Play vs AI - adjust difficulty in options"},
+        {"SINGLEPLAYER", MENU_MAIN_PLAY_1P, .info = "Play vs AI - adjust difficulty in options"},
         {"MULTIPLAYER", MENU_MAIN_PLAY_2P, .info = "Local 1v1 - requires two controllers"},
         {"OPTIONS", MENU_MAIN_OPTIONS, .info = "Change game mode, difficulty, and more"}
     },
